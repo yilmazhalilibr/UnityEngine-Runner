@@ -14,9 +14,9 @@ public class StartPanel : MonoBehaviour
     {
         _gameManager.GameState -= GameState;
     }
-    private void GameState(bool state)
+    private void GameState(GameStates state)
     {
-        if (state)
+        if (state == GameStates.START)
         {
             gameObject.SetActive(false);
         }

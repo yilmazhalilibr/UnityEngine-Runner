@@ -20,9 +20,9 @@ public class JumpButton : MonoBehaviour
         _gameManager.GameState -= GameStateChanged;
         _jumpButton.onClick.RemoveListener(JumpInvorker);
     }
-    private void GameStateChanged(bool state)
+    private void GameStateChanged(GameStates state)
     {
-        if (state)
+        if (state == GameStates.START)
         {
             _gameState = true;
         }

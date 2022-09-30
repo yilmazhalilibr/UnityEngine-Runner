@@ -22,10 +22,18 @@ public class PlatformMovement : MonoBehaviour
         _gameManager.GameState -= GameStateChanged;
 
     }
-    private void GameStateChanged(bool state)
+    private void GameStateChanged(GameStates state)
     {
-        _gameState = state;
+        if (state == GameStates.START)
+        {
+            _gameState = true;
+        }
+        else
+        {
+            _gameState = false;
+        }
     }
+
     private void FixedUpdate()
     {
         if (_gameState)

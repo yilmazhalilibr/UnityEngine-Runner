@@ -9,6 +9,9 @@ TagManager:
   - Platform
   - PlatformSpawner
   - Obstacles
+  - ship
+  - asteroid
+  - Obstacle
   layers:
   - Default
   - TransparentFX

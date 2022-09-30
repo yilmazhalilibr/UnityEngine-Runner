@@ -1,20 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using Zenject;
 
 public class ObstacleRandomSelector : MonoBehaviour
 {
     [SerializeField] private List<GameObject> _obstacles;
-    [SerializeField] private PlatformSpawner _platformSpawner;
 
-    private void Awake()
+    private PlatformSpawner _platformSpawner;
+    [Inject]
+    private void Constructor(PlatformSpawner platformSpawner)
     {
-        _platformSpawner.SpawnState += GetAllChildObstacle;
+        _platformSpawner = platformSpawner;
+        _platformSpawner.OnSpawnState += GetAllChildObstacle;
         GetAllChild();
     }
+
     private void OnDestroy()
     {
-        _platformSpawner.SpawnState -= GetAllChildObstacle;
+        _platformSpawner.OnSpawnState -= GetAllChildObstacle;
     }
     public void GetAllChild()
     {
@@ -26,29 +31,24 @@ public class ObstacleRandomSelector : MonoBehaviour
         var randomCount = UnityEngine.Random.Range(0, _obstacles.Count);
         _obstacles[randomCount].gameObject.SetActive(true);
     }
+
     private void GetAllChildObstacle(GameObject platform)
     {
-        var childs = new List<GameObject>();
+        var platformChilds = platform.transform.GetAllChilds().FindAll((child) => child.CompareTag("Obstacles"));
 
-        foreach (Transform child in platform.transform.GetAllChilds())
-        {
-            childs.Add(child.gameObject);
-        }
-
-        foreach (var model in childs)
+        foreach (var child in platformChilds)
         {
             var obstacles = new List<GameObject>();
 
-            if (model.CompareTag("Obstacles"))
+            var obstacleChilds = child.GetAllChilds();
+            foreach (var obstacleChild in obstacleChilds)
             {
-                foreach (var i in model.gameObject.transform.GetAllChilds())
-                {
-                    i.gameObject.SetActive(false);
-                    obstacles.Add(i.gameObject);
-                }
-                var randomCount1 = Random.Range(0, obstacles.Count);
-                obstacles[randomCount1].gameObject.SetActive(true);
+                obstacleChild.gameObject.SetActive(false);
+                obstacles.Add(obstacleChild.gameObject);
             }
+
+            var randomIndex = Random.Range(0, obstacles.Count);
+            obstacles[randomIndex].gameObject.SetActive(true);
 
         }
     }
