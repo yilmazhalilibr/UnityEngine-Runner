@@ -15,14 +15,13 @@ public class PlatformMovement : MonoBehaviour
     public Action<float> TimeSpeed;
     private void Awake()
     {
-        _gameManager.GameState += GameStateChanged;
+        _gameManager.GameState += OnGameStateChanged;
     }
     private void OnDestroy()
     {
-        _gameManager.GameState -= GameStateChanged;
-
+        _gameManager.GameState -= OnGameStateChanged;
     }
-    private void GameStateChanged(GameStates state)
+    private void OnGameStateChanged(GameStates state)
     {
         if (state == GameStates.START)
         {

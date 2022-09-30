@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Zenject;
+using System;
 
-public class CharacterAnimationSpeed : MonoBehaviour
+public class CharacterAnimation : MonoBehaviour
 {
     [SerializeField] private bool _gameState = false;
     [SerializeField] private PlatformMovement _platformMovement;
@@ -12,7 +13,10 @@ public class CharacterAnimationSpeed : MonoBehaviour
     [SerializeField] private float _timeSpeed;
     [SerializeField] private JumpButton _jumpButton;
     [SerializeField] private GameObject _character;
+    [SerializeField] private float _jumpForce = 250f;
     private GameManager _gameManager;
+    private Action<bool> OnGameStateChangedAction;
+    private Rigidbody _rigidbody;
     [Inject]
     private void Constructor(GameManager gameManager)
     {
@@ -20,14 +24,18 @@ public class CharacterAnimationSpeed : MonoBehaviour
         _gameManager.GameState += OnGameStateChanged;
         _jumpButton.CharacterJumpButton += CharacterJump;
         _platformMovement.TimeSpeed += AnimationSpeed;
+        OnGameStateChangedAction += AnimationSpeed;
         gameObject.TryGetComponent(out _animator);
+        _character.TryGetComponent(out _rigidbody);
     }
-  
+
     private void OnDestroy()
     {
         _gameManager.GameState -= OnGameStateChanged;
         _jumpButton.CharacterJumpButton -= CharacterJump;
         _platformMovement.TimeSpeed -= AnimationSpeed;
+        OnGameStateChangedAction -= AnimationSpeed;
+
     }
     private void OnGameStateChanged(GameStates state)
     {
@@ -38,6 +46,7 @@ public class CharacterAnimationSpeed : MonoBehaviour
         else
         {
             _gameState = false;
+            OnGameStateChangedAction?.Invoke(_gameState);
         }
     }
     private void AnimationSpeed(float speed)
@@ -52,6 +61,11 @@ public class CharacterAnimationSpeed : MonoBehaviour
             _animator.SetBool("GameState", false);
         }
     }
+    private void AnimationSpeed(bool state)
+    {
+        _animator.SetBool("GameState", state);
+        _animator.speed = 1;
+    }
     private void CharacterJump()
     {
         StartCoroutine(JumpAnimation());
@@ -60,13 +74,15 @@ public class CharacterAnimationSpeed : MonoBehaviour
     {
         _jumpButton.gameObject.SetActive(false);
         _animator.SetBool("Jump", true);
-        TryGetComponent(out Rigidbody rb);
-        rb.AddForce(transform.up * 250f);
+        _rigidbody.AddForce(transform.up * _jumpForce);
         yield return new WaitForSeconds(1f);
+
         //  UniTask.Delay(1500);
         _animator.SetBool("Jump", false);
         _jumpButton.gameObject.SetActive(true);
-
     }
+
+
+
 }
 

@@ -8,13 +8,13 @@ public class StartPanel : MonoBehaviour
 
     private void Awake()
     {
-        _gameManager.GameState += GameState;
+        _gameManager.GameState += OnGameStateChanged;
     }
     private void OnDestroy()
     {
-        _gameManager.GameState -= GameState;
+        _gameManager.GameState -= OnGameStateChanged;
     }
-    private void GameState(GameStates state)
+    private void OnGameStateChanged(GameStates state)
     {
         if (state == GameStates.START)
         {

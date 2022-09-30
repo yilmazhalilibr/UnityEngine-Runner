@@ -1,18 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class CharacterController : MonoBehaviour
 {
     [SerializeField] private GameObject _player;
     [SerializeField] private float _speed;
     [SerializeField] private PlatformMovement _platformMovement;
-    private float _horizontal;
     [SerializeField] private Joystick _joystick;
-    private void Start()
+    private float _horizontal;
+    private GameManager _gameManager;
+
+    [Inject]
+    private void Constructor(GameManager gameManager)
     {
+        _gameManager = gameManager;
         _platformMovement.TimeSpeed += TimeStateSpeedChanger;
+
     }
+
     private void OnDestroy()
     {
         _platformMovement.TimeSpeed -= TimeStateSpeedChanger;
@@ -26,6 +33,7 @@ public class CharacterController : MonoBehaviour
     }
     private void TimeStateSpeedChanger(float time)
     {
-        _speed = (time + 6) /2f;
+        _speed = (time + 6) / 2f;
     }
+  
 }

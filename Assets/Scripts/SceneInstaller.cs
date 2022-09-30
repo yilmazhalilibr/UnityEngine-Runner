@@ -9,5 +9,6 @@ public class SceneInstaller : MonoInstaller
     {
         Container.Bind<GameManager>().FromInstance(_gameManager);
         Container.Bind<PlatformSpawner>().FromInstance(_platformSpawner);
+
     }
 }

@@ -12,15 +12,15 @@ public class JumpButton : MonoBehaviour
     public event Action CharacterJumpButton;
     private void Awake()
     {
-        _gameManager.GameState += GameStateChanged;
+        _gameManager. GameState += OnGameStateChanged;
         _jumpButton.onClick.AddListener(JumpInvorker);
     }
     private void OnDestroy()
     {
-        _gameManager.GameState -= GameStateChanged;
+        _gameManager.GameState -= OnGameStateChanged;
         _jumpButton.onClick.RemoveListener(JumpInvorker);
     }
-    private void GameStateChanged(GameStates state)
+    private void OnGameStateChanged(GameStates state)
     {
         if (state == GameStates.START)
         {

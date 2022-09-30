@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class PlatformSpawner : MonoBehaviour
 {
@@ -11,48 +12,57 @@ public class PlatformSpawner : MonoBehaviour
     [SerializeField] private List<GameObject> _platformList;
     [SerializeField] private List<GameObject> _activePlatformList;
     [SerializeField] private float _obstacleSpace;
+    private GameManager _gameManager;
+    private bool _gameState = false;
     public Action<GameObject> OnSpawnState;
-    // private void Awake()
-    //{
-    //    for (int i = 0; i < 3; i++)
-    //    {
-    //        _platformList.Add(_platform);
-    //    }
-    //}
+    private BoxCollider _boxCollider;
+    [Inject]
+    private void Constructor(GameManager gameManager)
+    {
+        _gameManager = gameManager;
+        _gameManager.GameState += OnGameStateChanged;
+    }
+    private void OnDestroy()
+    {
+        _gameManager.GameState -= OnGameStateChanged;
 
+    }
     private void Update()
     {
-        PlatformSpawn();
+        if (_gameState)
+        {
+            PlatformSpawn();
+        }
     }
-
+    private void OnGameStateChanged(GameStates gameStates)
+    {
+        if (gameStates == GameStates.START)
+        {
+            _gameState = true;
+        }
+        else
+        {
+            _gameState = false;
+        }
+    }
     private void PlatformSpawn()
     {
-        //if (_platformList.Count < item)
-        //{
-        //    item = 0;
-        //}
-        //if (_activePlatformList.Count < 3)
-        //{
-        // var platformInstaniate = Instantiate(list[item]);
-        //  _activePlatformList.Add(platformInstaniate);
-        //   platformInstaniate.transform.position = new Vector3(0f, 0f, 80f * _activePlatformList.Count);
-        //}
+
         foreach (var item in _activePlatformList)
         {
             if (item.transform.position.z <= -79.98f)
             {
-                item.TryGetComponent(out PlatformMovement platformMovement);
-                var frontPlatform = platformMovement.GetFrontPlatform();
+                item.TryGetComponent(out PlatformMovement _platformMovement);
+                _platformMovement.gameObject.TryGetComponent(out _boxCollider);
+                _boxCollider.isTrigger = true;
+                var frontPlatform = _platformMovement.GetFrontPlatform();
                 item.transform.position = new Vector3(0f, 0f, frontPlatform.transform.position.z + _obstacleSpace);
-                //item.transform.position = new Vector3(0f, 0f, 160f);
                 OnSpawnState?.Invoke(item);
-            }
+                _boxCollider.isTrigger = false;
 
+
+            }
         }
-        //if (item > 3)
-        //{
-        //    item++;
-        //}
 
     }
 

@@ -23,15 +23,16 @@ public class GameManager : MonoBehaviour
         _startButton.onClick.RemoveListener(GameStart);
     }
 
-    private void GameStart()
+    public void GameStart()
     {
         _gameStarting = true;
         GameState?.Invoke(GameStates.START);
     }
-    private void GameFailed()
+    public void GameFailed()
     {
         _gameStarting = false;
         GameState?.Invoke(GameStates.END);
+        Debug.Log(_gameStarting);
     }
     public bool GetGameStateBool()
     {
